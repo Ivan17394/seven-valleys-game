@@ -1,0 +1,12 @@
+{
+  "name": "Королевство Семи Долин",
+  "short_name": "Семь Долин",
+  "description": "Изометрическая фэнтези-стратегия развития деревни",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#151a18",
+  "theme_color": "#171a18",
+  "icons": []
+}

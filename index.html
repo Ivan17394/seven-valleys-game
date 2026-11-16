@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#171a18">
+<meta name="description" content="Королевство Семи Долин — фэнтези-стратегия развития деревни">
+<link rel="manifest" href="manifest.webmanifest">
+<title>Королевство Семи Долин</title>
+<style>
+:root{--bg:#151a18;--panel:#222a26;--panel2:#2b342e;--gold:#d5ad62;--cream:#f3e8ce;--muted:#b5b19f;--line:#5b5848;--green:#6e8b61}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--cream);font-family:Georgia,serif;min-height:100dvh}
+button{font:inherit;color:inherit;cursor:pointer} .app{max-width:980px;margin:auto;min-height:100dvh;background:linear-gradient(#171b18,#111613)}
+header{padding:12px 14px 9px;background:linear-gradient(110deg,#292c25,#171b18);border-bottom:1px solid #78633b;position:sticky;top:0;z-index:5}
+.brand{display:flex;justify-content:space-between;align-items:center;gap:8px}.brand h1{font-size:18px;margin:0;color:#ead29c;letter-spacing:.3px}.sub{font:11px Arial;color:#b9b19e;margin-top:3px}
+.resources{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-top:10px}
+.res{background:#292e29;border:1px solid #5c523c;border-radius:9px;padding:6px 3px;text-align:center;font:12px Arial}.res b{display:block;color:#f4dfaa;font-size:14px;margin-top:2px}.res small{color:#a9a18d;font-size:9px}
+main{padding:10px 10px 90px}.scene-wrap{position:relative;border:1px solid #80683e;border-radius:13px;overflow:hidden;background:#27382b;box-shadow:0 7px 24px #0009}
+.scene{width:100%;display:block;aspect-ratio:1.55;object-fit:cover;filter:saturate(.88) contrast(1.04)}
+.scene-shade{position:absolute;inset:0;background:linear-gradient(180deg,#07100b99,transparent 25%,transparent 65%,#090e0bcc);pointer-events:none}
+.scene-title{position:absolute;top:10px;left:12px;text-shadow:0 2px 4px #000;font-size:15px;color:#fff0cf}
+.scene-title small{display:block;font:11px Arial;color:#e5d6b4;margin-top:3px}
+.level{position:absolute;right:10px;top:10px;background:#161b18cc;border:1px solid #a88b51;border-radius:8px;padding:6px 9px;font:11px Arial}
+.quest{position:absolute;left:10px;bottom:10px;max-width:75%;background:#151a17df;border:1px solid #76633e;border-radius:8px;padding:7px 9px;font:11px Arial}
+.quest b{color:#f0d28d}.section{margin-top:12px;background:linear-gradient(145deg,#252d28,#1d2420);border:1px solid #554d3b;border-radius:12px;padding:12px}
+.section h2{font-size:16px;color:#e8ce91;margin:0 0 9px}.hint{font:11px Arial;color:var(--muted);line-height:1.4}
+.buildings{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.building{background:#303a33;border:1px solid #5a614c;border-radius:9px;padding:9px 5px;text-align:center;min-height:80px}
+.building .ico{font-size:25px;display:block}.building b{font-size:11px;display:block;margin-top:4px}.building small{font:10px Arial;color:#b6b49e}
+.actions{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.action{background:linear-gradient(#465440,#2c382d);border:1px solid #8b794e;border-radius:9px;padding:11px 8px;text-align:left;font-size:13px}
+.action small{display:block;font:10px Arial;color:#d0c7ac;margin-top:4px}
+.action:active,.building:active{transform:scale(.98);filter:brightness(1.2)}
+.tabs{position:fixed;bottom:0;left:0;right:0;z-index:8;background:#171d19f5;border-top:1px solid #78633b;padding:7px max(8px,env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(5,1fr);gap:4px;max-width:980px;margin:auto}
+.tab{border:0;background:transparent;color:#c9bea4;font:10px Arial;padding:4px 1px;border-radius:8px}.tab span{display:block;font-size:20px;margin-bottom:3px}.tab.active{background:#3a4233;color:#f2d28c}
+.modal{position:fixed;inset:0;background:#000b;display:none;align-items:flex-end;justify-content:center;z-index:20;padding:10px}.modal.show{display:flex}
+.sheet{width:min(100%,600px);max-height:82dvh;overflow:auto;background:#222a25;border:1px solid #92784a;border-radius:16px 16px 10px 10px;padding:16px;box-shadow:0 0 40px #000}
+.sheet h2{margin:0 0 6px;color:#efd49b;font-size:19px}.sheet p{font:12px Arial;color:#c2baa6;line-height:1.45}
+.options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.opt{background:#303a32;border:1px solid #666447;border-radius:10px;padding:10px;text-align:left}.opt b{display:block;font-size:13px}.opt small{display:block;color:#c4bba3;font:10px Arial;margin-top:4px;line-height:1.4}
+.primary{background:#87693c!important;border-color:#d0ac68!important;color:#fff5df}
+.close{width:100%;margin-top:12px;padding:10px;border-radius:9px;border:1px solid #746348;background:#343c34}
+.region{display:inline-block;margin:4px 4px 0 0;padding:6px 8px;border:1px solid #655b43;border-radius:8px;background:#30382f;font:11px Arial;color:#e8d7ad}.locked{opacity:.55}.log{font:12px Arial;line-height:1.65;color:#d6cfbb}.toast{position:fixed;top:85px;left:50%;transform:translateX(-50%);background:#302d22;border:1px solid #c5a25d;padding:9px 13px;border-radius:9px;z-index:30;font:12px Arial;display:none;max-width:90%;text-align:center}
+@media(min-width:700px){main{padding:16px 18px 95px}.scene{aspect-ratio:1.9}.buildings{grid-template-columns:repeat(4,1fr)}.actions{grid-template-columns:repeat(4,1fr)}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+ <div class="brand"><div><h1>⚔ Королевство Семи Долин</h1><div class="sub">Фэнтези-стратегия · Северные земли</div></div><button id="settings" aria-label="Настройки" style="background:#34382e;border:1px solid #776443;border-radius:8px;padding:8px">⚙</button></div>
+ <div class="resources">
+  <div class="res">🪙<b id="gold">150</b><small>Золото</small></div>
+  <div class="res">🪵<b id="wood">100</b><small>Дерево</small></div>
+  <div class="res">🪨<b id="stone">70</b><small>Камень</small></div>
+  <div class="res">🌾<b id="food">100</b><small>Еда</small></div>
+  <div class="res">👥<b id="pop">8</b><small>Жители</small></div>
+ </div>
+</header>
+<main>
+ <div class="scene-wrap">
+  <img class="scene" src="village-scene.jpg" alt="Изометрическая фэнтези-деревня среди гор и лесов">
+  <div class="scene-shade"></div>
+  <div class="scene-title">Долина Серого Волка<small id="daylabel">День 1 · Раннее утро</small></div>
+  <div class="level">Уровень <b id="level">1</b><br><small id="xp">0 / 100 опыта</small></div>
+  <div class="quest"><b>📜 Задача старосты</b><br><span id="quest">Построй лесопилку и обеспечь деревню древесиной.</span></div>
+ </div>
+ <div class="section">
+  <h2>🏘️ Поселение</h2><div class="hint" id="village-summary">Небольшая деревня у подножия старого леса. Впереди много работы.</div>
+  <div class="buildings" id="building-list" style="margin-top:10px"></div>
+ </div>
+ <div class="section">
+  <h2>🛠️ Действия правителя</h2>
+  <div class="actions">
+   <button class="action" data-open="build">🏗️ Строительство<small>Новые здания и улучшения</small></button>
+   <button class="action" data-open="explore">🌲 Исследовать лес<small>Ресурсы, находки и опасности</small></button>
+   <button class="action" data-open="trade">🛒 Торговая площадь<small>Обмен ресурсов и золото</small></button>
+   <button class="action" data-open="people">🧑‍🌾 Жители<small>Новые семьи и рабочие</small></button>
+  </div>
+ </div>
+ <div class="section"><h2>📖 Летопись</h2><div class="log" id="log">• Ты принял власть над Долиной Серого Волка.</div></div>
+ <div class="section"><h2>💾 Сохранение</h2><div class="hint">Прогресс автоматически сохраняется на этом устройстве. Не очищай данные браузера, если хочешь сохранить поселение.</div><button class="close" id="save-now">Сохранить сейчас</button></div>
+</main>
+<nav class="tabs">
+ <button class="tab active" data-open="village"><span>🏰</span>Деревня</button>
+ <button class="tab" data-open="build"><span>🛠️</span>Строить</button>
+ <button class="tab" data-open="explore"><span>🌲</span>Мир</button>
+ <button class="tab" data-open="trade"><span>⚖️</span>Рынок</button>
+ <button class="tab" data-open="people"><span>👥</span>Люди</button>
+</nav>
+</div>
+<div class="modal" id="modal"><div class="sheet"><h2 id="modal-title">Раздел</h2><p id="modal-desc"></p><div class="options" id="modal-options"></div><button class="close" id="modal-close">Закрыть</button></div></div>
+<div class="toast" id="toast"></div>
+<script>
+const $=id=>document.getElementById(id);
+const initial={day:1,gold:150,wood:100,stone:70,food:100,pop:8,xp:0,buildings:{'Дом старосты':1,'Ферма':1},log:['Ты принял власть над Долиной Серого Волка.'],quest:0,forest:0,trustDruid:0,trustElf:0,animals:{'Олени':2,'Лисы':1,'Волки':0,'Кабаны':2},mana:10,witcherUnlocked:false,witcherProgress:0,fortressRooms:{'Зал испытаний':false,'Лаборатория мутагенов':false,'Библиотека контрактов':false,'Оружейная':false},witcherContracts:0,magicLevel:0,regions:{'Долина Серого Волка':'Открыта','Древний лес':'Не исследован','Эльфийские руины':'Не исследованы','Чёрные болота':'Не исследованы','Северные горы':'Не исследованы'}};
+let state;try{state=JSON.parse(localStorage.getItem('sevenValleysSave'))||initial}catch(e){state=initial}
+state={...initial,...state,animals:{...initial.animals,...(state.animals||{})},regions:{...initial.regions,...(state.regions||{})},fortressRooms:{...initial.fortressRooms,...(state.fortressRooms||{})}};
+const defs=[
+{name:'Дом',icon:'🏠',cost:[45,25,0],desc:'Вместимость +4 жителя',yield:'Жильё для новых семей'},
+{name:'Лесопилка',icon:'🪓',cost:[35,30,10],desc:'+18 дерева за день',yield:'Добывает древесину'},
+{name:'Каменоломня',icon:'⛏️',cost:[40,25,15],desc:'+14 камня за день',yield:'Добывает камень'},
+{name:'Ферма',icon:'🌾',cost:[40,20,5],desc:'+22 еды за день',yield:'Выращивает урожай'},
+{name:'Кузница',icon:'⚒️',cost:[75,45,35],desc:'+12 золота за день',yield:'Кует инструменты и оружие'},
+{name:'Таверна',icon:'🍺',cost:[80,55,15],desc:'+20 золота за день',yield:'Привлекает торговцев'},
+{name:'Часовня',icon:'🕯️',cost:[95,45,45],desc:'Повышает настроение',yield:'Укрепляет дух жителей'},
+{name:'Башня чародея',icon:'🔮',cost:[130,65,80],desc:'Открывает магические находки',yield:'Защищает от тёмной магии'}
+];
+function count(n){return state.buildings[n]||0}
+function save(){localStorage.setItem('sevenValleysSave',JSON.stringify(state))}
+function note(t){state.log.unshift(t);state.log=state.log.slice(0,6);save()}
+function toast(t){$('toast').textContent=t;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2200)}
+function render(){
+ ['gold','wood','stone','food','pop'].forEach(k=>$(k).textContent=Math.floor(state[k]));
+ const lvl=1+Math.floor(state.xp/100);$('level').textContent=lvl;$('xp').textContent=(state.xp%100)+' / 100 опыта';
+ $('daylabel').textContent='День '+state.day+' · '+['Раннее утро','Полдень','Вечер','Туманное утро'][state.day%4];
+ $('building-list').innerHTML=Object.entries(state.buildings).map(([n,v])=>{let d=defs.find(x=>x.name===n);let ico=n==='Дом старосты'?'🏰':d?.icon||'🏡';return `<div class="building"><span class="ico">${ico}</span><b>${n}</b><small>Построек: ${v}</small></div>`}).join('');
+ $('log').innerHTML=state.log.map(x=>'• '+x).join('<br>');
+ $('fortress-status').textContent=state.witcherProgress>=3?'Восстановлена · школа вновь действует':state.witcherProgress===2?'Ингредиенты собраны · готова к восстановлению':state.witcherProgress===1?'Найдена · нужны ингредиенты':'Заброшена · путь ещё предстоит открыть';
+ $('fortress-rooms').innerHTML=Object.entries(state.fortressRooms).map(([n,v])=>`<div class="building"><span class="ico">${({'Зал испытаний':'⚔️','Лаборатория мутагенов':'⚗️','Библиотека контрактов':'📜','Оружейная':'🛡️'}[n])}</span><b>${n}</b><small>${v?'Восстановлена':'Руины'}</small></div>`).join('');
+
+ $('wildlife-list').innerHTML=Object.entries(state.animals).map(([n,v])=>`<div class="building"><span class="ico">${({'Олени':'🦌','Лисы':'🦊','Волки':'🐺','Кабаны':'🐗'}[n]||'🐾')}</span><b>${n}</b><small>${v} в округе</small></div>`).join('');
+ $('regions-list').innerHTML=Object.entries(state.regions).map(([n,v])=>`<span class="region ${v.startsWith('Не')?'locked':''}">${v.startsWith('Не')?'🔒':'🗺️'} ${n} · ${v}</span>`).join('')+`<p style="margin:8px 0 0;color:#c7bda5">Доверие друидов: ${state.trustDruid}/5 · Отношения с эльфами: ${state.trustElf}/5 · Мана: ${state.mana} · Магия: ${state.magicLevel} ур.</p>`;
+ const quests=['Построй лесопилку и обеспечь деревню древесиной.','Пригласи ещё две семьи в деревню.','Построй кузницу — деревне нужны инструменты.','Исследуй старый лес и найди следы чудовища.'];
+ $('quest').textContent=quests[Math.min(state.quest,3)];
+ $('village-summary').textContent=`В поселении ${state.pop} жителей. Построено зданий: ${Object.values(state.buildings).reduce((a,b)=>a+b,0)}. Уровень королевства: ${lvl}.`;
+ save();
+}
+function openModal(key){
+ const data={
+ build:['Строительство','Выбери здание. Стоимость списывается сразу, постройка появляется в поселении.',defs.map(d=>({icon:d.icon,title:d.name,desc:`${d.desc} · 🪙${d.cost[0]} 🪵${d.cost[1]} 🪨${d.cost[2]}`,disabled:state.gold<d.cost[0]||state.wood<d.cost[1]||state.stone<d.cost[2],run:()=>build(d)}))],
+ explore:['Исследование мира','Разведчики могут найти ресурсы, древние руины или столкнуться с опасностью.',[
+ {icon:'🌳',title:'Собирать древесину',desc:'Получить 20–35 дерева',run:()=>{state.wood+=25;state.xp+=8;note('Разведчики вернулись с древесиной.');toast('Получено 25 дерева');render()}},
+ {icon:'⛏️',title:'Искать камень',desc:'Получить 15–25 камня',run:()=>{state.stone+=20;state.xp+=8;note('Найдена каменная жила.');toast('Получено 20 камня');render()}},
+ {icon:'🗝️',title:'Осмотреть древние руины',desc:'Рискованная экспедиция за сокровищами',run:()=>{let r=Math.random();if(r<.65){state.gold+=45;state.xp+=18;note('В руинах найден сундук с монетами.');toast('Найдено 45 золота')}else if(count('Башня чародея')){state.gold+=90;state.xp+=25;note('Чародей распознал древний тайник.');toast('Найдено 90 золота')}else{state.food=Math.max(0,state.food-10);note('Экспедиция встретила болотную тварь. Запасы потеряны.');toast('Опасность! Потеряно 10 еды')}render()}}
+ ]],
+ trade:['Торговая площадь','Обменивай припасы на монеты. Цены меняются от спроса.',[
+ {icon:'🌾',title:'Продать 15 еды',desc:'Получить 25 золота',disabled:state.food<15,run:()=>{state.food-=15;state.gold+=25;note('Продано 15 единиц еды.');toast('+25 золота');render()}},
+ {icon:'🪵',title:'Продать 15 дерева',desc:'Получить 22 золота',disabled:state.wood<15,run:()=>{state.wood-=15;state.gold+=22;note('Продано 15 единиц дерева.');toast('+22 золота');render()}},
+ {icon:'🪨',title:'Купить 20 камня',desc:'Заплатить 35 золота',disabled:state.gold<35,run:()=>{state.gold-=35;state.stone+=20;note('Куплено 20 камня.');toast('Получено 20 камня');render()}}
+ ]],
+ people:['Жители деревни','Новые жители нужны для работы и развития. Для каждой семьи требуется жильё и еда.',[
+ {icon:'🧑‍🌾',title:'Пригласить семью',desc:'2 жителя · 30 золота · 15 еды',disabled:state.gold<30||state.food<15||state.pop+2>8+4*count('Дом'),run:()=>{state.gold-=30;state.food-=15;state.pop+=2;state.xp+=10;note('В деревню прибыли две новые семьи.');toast('Население выросло!');render()}},
+ {icon:'📜',title:'Объявить ярмарку',desc:'Привлечь торговцев за 20 золота',disabled:state.gold<20,run:()=>{state.gold-=20;state.gold+=35;note('Ярмарка привлекла купцов.');toast('Прибыль ярмарки: 15 золота');render()}}
+ ]],
+ forest:['Древний лес','Исследуй чащи. Чем глубже заходишь, тем ценнее находки — и опаснее встречи.',[
+ {icon:'🍄',title:'Собрать лесные травы',desc:'Получить припасы и немного маны',run:()=>{state.food+=12;state.mana+=3;state.forest++;state.xp+=8;note('Сборщики нашли целебные травы и светящийся мох.');toast('+12 еды · +3 маны');render()}},
+ {icon:'🦌',title:'Поставить фотоловушки',desc:'Наблюдать за животными, не причиняя им вреда',run:()=>{state.animals['Олени']+=1;state.animals['Лисы']+=1;state.forest++;state.xp+=8;note('В лесу замечены новые животные: олени и лисы.');toast('Животных в лесу стало больше');render()}},
+ {icon:'🌳',title:'Найти священную рощу',desc:'Открывает путь к друидам',run:()=>{state.forest+=1;state.trustDruid=Math.min(5,state.trustDruid+1);state.mana+=5;state.regions['Древний лес']='Исследован';state.xp+=15;note('Ты нашёл священную рощу. Друиды заметили твоё уважение к лесу.');toast('Доверие друидов +1 · +5 маны');render()}},
+ {icon:'🐾',title:'Следы чудовища',desc:'Опасная вылазка за редкими трофеями',run:()=>{if(Math.random()<.55){state.gold+=35;state.mana+=4;note('Следы привели к логову болотного зверя. Разведчики вернулись с трофеем.');toast('+35 золота · +4 маны')}else{state.food=Math.max(0,state.food-8);note('Разведчики попали в засаду лесных тварей.');toast('Потеряно 8 еды')}state.xp+=12;render()}}
+ ]],
+ factions:['Друиды и эльфы','Народы леса не подчиняются твоей короне. Их доверие нужно заслужить поступками и дарами.',[
+ {icon:'🌿',title:'Помочь друидам очистить источник',desc:'Нужно 10 еды · доверие друидов +1',disabled:state.food<10||state.trustDruid>=5,run:()=>{state.food-=10;state.trustDruid++;state.mana+=8;state.xp+=15;note('Друиды очистили древний источник и поделились каплей маны.');toast('Друиды стали доверять тебе больше');render()}},
+ {icon:'🧝',title:'Отправить посольство к эльфам',desc:'Нужно 25 золота · доверие эльфов +1',disabled:state.gold<25||state.trustElf>=5,run:()=>{state.gold-=25;state.trustElf++;state.xp+=12;if(state.trustElf>=2)state.regions['Эльфийские руины']='Открыты';note('Эльфийские послы приняли твои дары.');toast('Отношения с эльфами улучшились');render()}},
+ {icon:'🦌',title:'Заповедник для зверей',desc:'Нужно 20 дерева и 10 еды',disabled:state.wood<20||state.food<10,run:()=>{state.wood-=20;state.food-=10;state.animals['Олени']+=2;state.animals['Кабаны']+=1;state.xp+=10;note('На опушке устроен лесной заповедник. Звери возвращаются.');toast('В заповеднике появились животные');render()}}
+ ]],
+ magic:['Магия и древние знания','Магия редка и требует маны, знаний и союзников. Башня чародея открывает больше возможностей.',[
+ {icon:'✨',title:'Изучить защитные знаки',desc:'Нужно 8 маны · опыт магии +1',disabled:state.mana<8,run:()=>{state.mana-=8;state.magicLevel++;state.xp+=15;note('Ты изучил защитные знаки древних хранителей.');toast('Уровень магии повышен');render()}},
+ {icon:'🌙',title:'Ритуал лунного источника',desc:'Нужно 5 маны и доверие друидов 1+',disabled:state.mana<5||state.trustDruid<1,run:()=>{state.mana-=5;state.gold+=30;state.food+=10;state.xp+=20;note('Друиды провели ритуал у лунного источника.');toast('Ритуал принёс +30 золота и +10 еды');render()}},
+ {icon:'🔮',title:'Построить башню чародея',desc:'Нужно сначала построить обычную башню в разделе строительства',disabled:!count('Башня чародея'),run:()=>{state.mana+=15;state.magicLevel++;state.xp+=20;note('Башня чародея пробудилась. В её стенах звучит древняя магия.');toast('+15 маны · магия усилена');render()}}
+ ]],
+ witchers:['Крепость Серебряного Ордена','Ведьмаки — редкие охотники, а не регулярная армия. Открой крепость, восстанови её помещения и выполняй особые контракты.',[
+ {icon:'🏚️',title:'Найти следы крепости',desc:'Нужно исследовать лес 2 раза',disabled:state.forest<2||state.witcherProgress>0,run:()=>{state.witcherProgress=1;state.regions['Северные горы']='Разведаны';state.xp+=20;note('Разведчики обнаружили тропу к заброшенной крепости ведьмаков.');toast('Найден путь к крепости');render()}},
+ {icon:'🧪',title:'Собрать ведьмачьи ингредиенты',desc:'Нужно 30 золота, 15 еды и 5 маны',disabled:state.witcherProgress!==1||state.gold<30||state.food<15||state.mana<5,run:()=>{state.gold-=30;state.food-=15;state.mana-=5;state.witcherProgress=2;note('Собраны редкие травы, мутагены и серебряная пыль.');toast('Ингредиенты готовы');render()}},
+ {icon:'🏰',title:'Восстановить крепость',desc:'Нужно 100 дерева и 80 камня',disabled:state.witcherProgress!==2||state.wood<100||state.stone<80,run:()=>{state.wood-=100;state.stone-=80;state.witcherProgress=3;state.regions['Северные горы']='Открыты';note('Крепость Серебряного Ордена восстановлена.');toast('Крепость восстановлена!');render()}},
+ {icon:'⚔️',title:'Восстановить зал испытаний',desc:'Нужно 45 золота, 35 дерева и 20 камня',disabled:state.witcherProgress<3||state.fortressRooms['Зал испытаний']||state.gold<45||state.wood<35||state.stone<20,run:()=>{state.gold-=45;state.wood-=35;state.stone-=20;state.fortressRooms['Зал испытаний']=true;state.xp+=20;note('В крепости открыт зал испытаний.');toast('Зал испытаний восстановлен');render()}},
+ {icon:'⚗️',title:'Открыть лабораторию мутагенов',desc:'Нужно 45 золота, 35 дерева и 20 камня',disabled:state.witcherProgress<3||state.fortressRooms['Лаборатория мутагенов']||state.gold<45||state.wood<35||state.stone<20,run:()=>{state.gold-=45;state.wood-=35;state.stone-=20;state.fortressRooms['Лаборатория мутагенов']=true;state.mana+=8;state.xp+=20;note('В лаборатории изучают мутагены и ведьмачьи эликсиры.');toast('Лаборатория открыта · +8 маны');render()}},
+ {icon:'📜',title:'Открыть библиотеку контрактов',desc:'Нужно 45 золота, 35 дерева и 20 камня',disabled:state.witcherProgress<3||state.fortressRooms['Библиотека контрактов']||state.gold<45||state.wood<35||state.stone<20,run:()=>{state.gold-=45;state.wood-=35;state.stone-=20;state.fortressRooms['Библиотека контрактов']=true;state.xp+=20;note('В библиотеке появились первые контракты на чудовищ.');toast('Библиотека контрактов открыта');render()}},
+ {icon:'🛡️',title:'Восстановить оружейную',desc:'Нужно 45 золота, 35 дерева и 20 камня',disabled:state.witcherProgress<3||state.fortressRooms['Оружейная']||state.gold<45||state.wood<35||state.stone<20,run:()=>{state.gold-=45;state.wood-=35;state.stone-=20;state.fortressRooms['Оружейная']=true;state.xp+=20;note('В оружейной выкованы серебряные клинки.');toast('Оружейная восстановлена');render()}},
+ {icon:'🐺',title:'Пройти испытание ведьмака',desc:'Нужно 100 золота, 10 маны и уровень королевства 3',disabled:state.witcherProgress!==3||state.witcherUnlocked||state.gold<100||state.mana<10||1+Math.floor(state.xp/100)<3,run:()=>{state.gold-=100;state.mana-=10;state.witcherUnlocked=true;state.xp+=40;note('Ведьмак Каэрен из Серебряного Ордена согласился стать твоим редким героем-союзником.');toast('Получен ведьмак Каэрен!');render()}},
+ {icon:'📜',title:'Взять контракт на чудовище',desc:'Нужны ведьмак-союзник и библиотека контрактов · 20 золота',disabled:!state.witcherUnlocked||!state.fortressRooms['Библиотека контрактов']||state.gold<20,run:()=>{state.gold-=20;state.witcherContracts=(state.witcherContracts||0)+1;let reward=65+state.witcherContracts*10;state.gold+=reward;state.xp+=30;note('Ведьмак Каэрен выполнил контракт на чудовище. Награда: '+reward+' золота.');toast('Контракт завершён · +'+reward+' золота');render()}}
+ ]],
+  settings:['Настройки','Сохранение хранится локально в браузере на этом устройстве.',[
+ {icon:'💾',title:'Сохранить игру',desc:'Записать текущий прогресс',run:()=>{save();toast('Игра сохранена')}},
+ {icon:'↻',title:'Начать заново',desc:'Сбросить королевство и начать сначала',run:()=>{if(confirm('Удалить текущее сохранение и начать новую игру?')){state=JSON.parse(JSON.stringify(initial));save();render();toast('Новое королевство создано')}}}
+ ]]
+ };
+ const d=data[key];if(!d)return;
+ $('modal-title').textContent=d[0];$('modal-desc').textContent=d[1];
+ $('modal-options').innerHTML=d[2].map((o,i)=>`<button class="opt" data-opt="${i}" ${o.disabled?'disabled':''}><span style="font-size:23px">${o.icon}</span><b>${o.title}</b><small>${o.desc}</small></button>`).join('');
+ $('modal-options').querySelectorAll('[data-opt]').forEach((b,i)=>b.onclick=()=>{if(!d[2][i].disabled){d[2][i].run();$('modal').classList.remove('show')}});
+ $('modal').classList.add('show');
+}
+function build(d){state.gold-=d.cost[0];state.wood-=d.cost[1];state.stone-=d.cost[2];state.buildings[d.name]=(state.buildings[d.name]||0)+1;state.xp+=25;note('Построено здание: '+d.name+'.');if(d.name==='Лесопилка'&&state.quest===0)state.quest=1;if(d.name==='Кузница'&&state.quest===2)state.quest=3;toast('Построено: '+d.name);render()}
+function nextDay(){
+ state.day++;state.wood+=18*count('Лесопилка');state.stone+=14*count('Каменоломня');state.food+=22*count('Ферма');state.gold+=12*count('Кузница')+20*count('Таверна');state.food-=Math.ceil(state.pop*1.5);
+ if(state.food<0){state.food=0;state.pop=Math.max(2,state.pop-1);note('Недостаточно еды! Житель покинул деревню.')}else{state.gold+=Math.floor(state.pop*1.2);note('Наступил день '+state.day+'. Жители трудились и пополнили запасы.')}
+ if(Math.random()<.3){let events=[['🐺 Волки бродят у опушки. Стража не подпускает их к домам.',0],['🧙 Странствующая чародейка оставила дар: 15 золота.',15],['🧳 Купец прибыл из соседнего княжества: +20 золота.',20]];let e=events[Math.floor(Math.random()*events.length)];state.gold+=e[1];note(e[0])}
+ state.xp+=10;render();toast('Начался новый день');
+}
+document.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));if(b.dataset.open!=='village')openModal(b.dataset.open)}));
+$('settings').onclick=()=>openModal('settings');$('modal-close').onclick=()=>$('modal').classList.remove('show');$('modal').onclick=e=>{if(e.target===$('modal'))$('modal').classList.remove('show')};
+$('save-now').onclick=()=>{save();toast('Игра сохранена на устройстве')};
+render();
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body></html>
